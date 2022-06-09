@@ -1,7 +1,6 @@
-module Chapter_1_1 where
+module Chap_01_Ex_01 where
+
 import Text.XHtml (input)
-
-
 
 prods input = map (product input /) input
 

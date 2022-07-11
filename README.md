@@ -1,0 +1,3 @@
+# My solutions to coding Problems
+
+If you wounder, why some of my solutions to those coding Problems are written a bit weird, this is because I do it for practice not to produce the best possible solution. For example I will often use clone explicit in my Rust code, not because I think it's the best way to do so, but to explicitly see, where clones occur. Also I will try to write my rust code as generic as possible to learn more about the features of generics in rust. If a Coding Problem for example is about arrays of numbers I will use arrays of generic objects wich implement the needed operations instead of some number type. I will assume that the implementation of those operators follow the rules of commutativity, associativity and distributivity.

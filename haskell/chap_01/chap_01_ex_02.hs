@@ -1,8 +1,9 @@
 module Chap_01_Ex_02 where
 
+-- Exercise: for a List calculate the smallest Window form where to where it has to be sorted, so that the whole list is sorted
 
-sample = [0,1,2,3,4,5,6,7,8,9]
-
+-- Solution: in O(n)
+-- we iterate once from the left and once from the right. while Iterating we keep track of the smallest or largest Element so far. How far this Element has to travel is the index to which or from which the List has to be sorted. It's like one Bubblesort iteration from the right and one from the left
 getSmalestWindowToSort [] = (0,0)
 getSmalestWindowToSort l = (leftIndex l, rightIndex l) where
     rightIndex [] = 0

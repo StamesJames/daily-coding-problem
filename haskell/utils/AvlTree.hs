@@ -1,5 +1,4 @@
-module AvlTree where
-import Control.Applicative (Alternative(some))
+module Haskell.Utils.AvlTree(AvlTree(Leaf, Node), insert) where
 
 data AvlTree a = Leaf | Node {myElem::a, left::AvlTree a, right::AvlTree a, myHeight::Integer, myCount::Integer} 
 

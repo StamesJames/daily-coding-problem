@@ -1,7 +1,3 @@
-trait Zero{
-    fn zero() -> Self;
-}
-
-trait One{
-    fn one() -> Self;
-}
+pub mod avl_tree;
+pub mod algebra_structure;
+pub mod red_black_tree;

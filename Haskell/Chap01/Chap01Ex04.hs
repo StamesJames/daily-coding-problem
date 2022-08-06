@@ -16,6 +16,7 @@ findNumberOfSmallerElementsToTheRight ls = result where
     lsRev = reverse ls
     result = fst $ foldl (\(indices, sorted) n -> case ordInsert n sorted of (i, newSorted) -> (i:indices, newSorted)) ([],[]) lsRev
 
+-- This should now work in O(n log n) because the AvlTree.insert function should be in O(log n)
 findNumberOfSmallerElementsToTheRightUsingAvlTree :: Ord a => [a] -> [Integer]
 findNumberOfSmallerElementsToTheRightUsingAvlTree ls = fst $
     foldr 

@@ -76,3 +76,21 @@ reduceCount x m =
         Map.insert x (-1) m
     where 
         newVal = (m Map.! x) - 1
+
+
+-- A BruteForce Solution that is a bit easier to read
+
+
+getAllSubstringsOfLength :: String -> Int -> [String]
+getAllSubstringsOfLength s i = [take i (drop x s) | x <- [0..length s - i]]
+
+enumerate l = snd $ foldr (\elem (i,acc) -> (i-1, (i,elem):acc)) (length l - 1, []) l
+
+findAnagramStartingIndicesBruteForce :: String -> String -> [Int]
+findAnagramStartingIndicesBruteForce w s = 
+    let 
+        countW = mapify w
+        allSubstrings = enumerate (getAllSubstringsOfLength s (length w))
+    in
+        map fst (filter (\(i, str) -> mapify str == countW) allSubstrings)
+

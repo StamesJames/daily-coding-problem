@@ -1,67 +1,17 @@
-use std::{collections::HashMap, hash::Hash, isize};
 
 use queues::{Queue, IsQueue};
+use unicode_segmentation::UnicodeSegmentation;
+use crate::utils::counter::Counter; 
 
-#[derive(Debug)]
-enum Counter<K> 
-where
-    K: Eq + Hash
-    {
-        Counter(HashMap<K,isize>),
-    } 
-    
-impl<K> Counter<K> 
-where
-    K: Eq + Hash + Clone
-{
-    fn add_count(&mut self, elem: &K, count: isize){
-        let Self::Counter(map) = self;
-        let old_val = map.get(elem);
-        match old_val {
-            Some(old_count) => {
-                let new_val = old_count + count;
-                if new_val == 0 {
-                    map.remove(elem);
-                }else {
-                    map.insert(elem.clone(), new_val);
-                }
-            },
-            None => {map.insert(elem.clone(), count);},
-        };
-    }
 
-    fn increment(&mut self, elem: &K){
-        self.add_count(elem, 1);
-    }
-    fn decrement(&mut self, elem: &K){
-        self.add_count(elem, -1);
-    }
-    fn empty(&self) -> bool {
-        let Counter::Counter(map) = self;
-        return map.is_empty();
-    }
-    fn new() -> Counter<K>{
-        return Counter::Counter(HashMap::new());
-    }
-}
-
-impl Counter<char> {
-    fn from_string(str: &str) -> Counter<char>{
-        let mut counter = Counter::new();
-        for char in str.chars() {
-            counter.increment(&char);
-        }
-        return counter;
-    }
-}
 
 pub fn find_anagram_indices(w: &str, s: &str) -> Vec<usize> {
-    let mut count_w = Counter::from_string(&w);
+    let mut count_w = Counter::from_string_grapheme(&w);
     let mut result = Vec::new();
     let mut window = Queue::new();
     println!("{count_w:?}");
     if w.len() > s.len() {return vec![];}
-    for (i, char) in s.chars().enumerate() {
+    for (i, char) in s.graphemes(true).enumerate() {
         if i < w.len() {
             window.add(char);
             count_w.decrement(&char);

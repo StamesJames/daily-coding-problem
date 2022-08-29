@@ -35,7 +35,7 @@ allSuffixes w@(x:xs) = w : allSuffixes xs
 -- I've written this function in this way just for practice. for a faster solution we could get rid of some reverses, because in the function findPalindromPairsQuadratInWord we use the words reversed anyways 
 allPrefixes = reverse . map reverse . allSuffixes . reverse
 
-findPalindromPairsQuadratInWord ws = do
+findPalindromPairsSquareInWord ws = do
     let m = putInMap ws
     w <- ws
     (prefRev, suf) <- zip (map reverse $ allPrefixes w) (allSuffixes w)

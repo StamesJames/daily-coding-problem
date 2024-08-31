@@ -15,68 +15,86 @@ pub enum AvlTree<T> {
     },
 }
 
-impl<T> AvlTree<T> 
-where 
-    T: Ord
+impl<T> AvlTree<T>
+where
+    T: Ord,
 {
     pub fn new() -> Self {
         AvlTree::Leaf
     }
 
     pub fn from_t(elem: T) -> Self {
-        AvlTree::Node { 
-            elem: Box::new(elem), 
-            left: Box::new(AvlTree::new()), 
-            right: Box::new(AvlTree::new()), 
-            height: 1, count: 1 
+        AvlTree::Node {
+            elem: Box::new(elem),
+            left: Box::new(AvlTree::new()),
+            right: Box::new(AvlTree::new()),
+            height: 1,
+            count: 1,
         }
     }
 
-    fn height(&self)->usize{
+    fn height(&self) -> usize {
         match self {
             Self::Leaf => 0,
-            Self::Node{height, ..} => *height
+            Self::Node { height, .. } => *height,
         }
     }
-    fn count(&self)->usize{
+    fn count(&self) -> usize {
         match self {
             Self::Leaf => 0,
-            Self::Node{count, ..} => *count
+            Self::Node { count, .. } => *count,
         }
     }
 
+    /// returns (usize, bool) with 1: inorder index 2: is the element inserted
     pub fn insert(&mut self, new_elem: T) -> (usize, bool) {
         let (index, inserted);
         match self {
             Self::Leaf => {
                 *self = AvlTree::from_t(new_elem);
                 return (0, true);
-            },
-            Self::Node { elem, left, right, count, height} => {
-                if new_elem < **elem {
-                    (index, inserted) = left.insert(new_elem);
-                } else if new_elem > **elem {
-                    (index, inserted) = {|(i,b)| (i+left.count()+1, b)}(right.insert(new_elem));
-                } else {
-                    return (left.count(), false);
+            }
+            Self::Node {
+                elem,
+                left,
+                right,
+                count,
+                height,
+            } => {
+                match new_elem.cmp(elem) {
+                    std::cmp::Ordering::Less => (index, inserted) = left.insert(new_elem),
+                    std::cmp::Ordering::Equal => return (left.count(), false),
+                    std::cmp::Ordering::Greater => {
+                        (index, inserted) =
+                            { |(i, b)| (i + left.count() + 1, b) }(right.insert(new_elem))
+                    }
                 }
                 *count = left.count() + right.count() + 1;
                 *height = max(left.height(), right.height()) + 1;
             }
         }
         self.balance();
-        return (index, inserted);
+        (index, inserted)
     }
 
-    fn balance(&mut self){
+    fn balance(&mut self) {
         match self {
             Self::Leaf => (),
-            Self::Node { left:left_n, right:right_n, ..} => {
-
-                if left_n.height() > right_n.height()+1 {
+            Self::Node {
+                left: left_n,
+                right: right_n,
+                ..
+            } => {
+                if left_n.height() > right_n.height() + 1 {
                     match &**left_n {
-                        Self::Leaf => panic!("In balancing the left child was to high, but it was a Leaf"),
-                        Self::Node { left:left_l, right:right_l, ..} => {
+                        Self::Leaf => {
+                            panic!("In balancing the left child was to high, but it was a Leaf")
+                        }
+                        Self::Node {
+                            left: left_l,
+                            right: right_l,
+                            ..
+                        } => {
                             if left_l.height() >= right_l.height() {
                                 self.rotate_right()
                             } else {
@@ -85,10 +103,16 @@ where
                             }
                         }
                     };
-                } else if right_n.height() > left_n.height()+1{
+                } else if right_n.height() > left_n.height() + 1 {
                     match &**right_n {
-                        Self::Leaf => panic!("In balancing the left child was to high, but it was a Leaf"),
-                        Self::Node { left:left_r, right:right_r, ..} => {
+                        Self::Leaf => {
+                            panic!("In balancing the left child was to high, but it was a Leaf")
+                        }
+                        Self::Node {
+                            left: left_r,
+                            right: right_r,
+                            ..
+                        } => {
                             if right_r.height() >= left_r.height() {
                                 self.rotate_left();
                             } else {
@@ -101,16 +125,28 @@ where
             }
         }
     }
-    fn rotate_right(&mut self){
+    fn rotate_right(&mut self) {
         match self {
             Self::Leaf => panic!("can't rotate a Leaf to the right"),
-            Self::Node { elem:elem_n, left:left_n, right:right_n, height:height_n, count:count_n } => {
+            Self::Node {
+                elem: elem_n,
+                left: left_n,
+                right: right_n,
+                height: height_n,
+                count: count_n,
+            } => {
                 let a;
                 let b;
                 let c;
                 match &mut **left_n {
                     Self::Leaf => panic!("can't rotate a node with left leaf to the right"),
-                    Self::Node { elem:elem_l, left:left_l, right:right_l, height:height_l, count:count_l } => {
+                    Self::Node {
+                        elem: elem_l,
+                        left: left_l,
+                        right: right_l,
+                        height: height_l,
+                        count: count_l,
+                    } => {
                         //extracting all relevant subtrees owned, and replacing them with Leafs
                         a = mem::take(left_l);
                         b = mem::take(right_l);
@@ -135,20 +171,32 @@ where
             }
         }
     }
-    
-     fn rotate_left(&mut self){
+
+    fn rotate_left(&mut self) {
         match self {
             Self::Leaf => panic!("can't rotate a Leaf to the right"),
-            Self::Node { elem:elem_n, left:left_n, right:right_n, height:height_n, count:count_n } => {
+            Self::Node {
+                elem: elem_n,
+                left: left_n,
+                right: right_n,
+                height: height_n,
+                count: count_n,
+            } => {
                 let a;
                 let b;
                 let c;
                 match &mut **right_n {
                     Self::Leaf => panic!("can't rotate a node with left leaf to the right"),
-                    Self::Node { elem:elem_r, left:left_r, right:right_r, height:height_r, count:count_r } => {
+                    Self::Node {
+                        elem: elem_r,
+                        left: left_r,
+                        right: right_r,
+                        height: height_r,
+                        count: count_r,
+                    } => {
                         //extracting all relevant subtrees owned, and replacing them with Leafs
-                        a = mem::take(left_n );
-                        b = mem::take(left_r );
+                        a = mem::take(left_n);
+                        b = mem::take(left_r);
                         c = mem::take(right_r);
                         // creating the new right child of the root that is to be rotated. It is created in place at the location of the former left child, so no new allocations have to be done
                         mem::swap(elem_n, elem_r);
@@ -167,57 +215,69 @@ where
             }
         }
     }
-    
-    fn is_balanced(&self)-> bool{
+
+    pub fn is_balanced(&self) -> bool {
         match self {
             Self::Leaf => true,
-            Self::Node { left, right, ..} => {
+            Self::Node { left, right, .. } => {
                 let l_height = left.height();
                 let r_height = right.height();
-                return left.is_balanced() && right.is_balanced() && l_height + 1 >= r_height && r_height + 1 >= l_height;
+                left.is_balanced()
+                    && right.is_balanced()
+                    && l_height + 1 >= r_height
+                    && r_height + 1 >= l_height
             }
         }
     }
-
 }
 
 impl<T> Display for AvlTree<T>
 where
-    T: Display
+    T: Display,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.simple_braces_string(0))
     }
 }
 
-
 impl<T> AvlTree<T>
 where
-T: Display
+    T: Display,
 {
     fn simple_braces_string(&self, ebene: usize) -> String {
         let branch_symbols = "   ";
         match self {
             AvlTree::Leaf => branch_symbols.repeat(ebene) + "()\n",
-            AvlTree::Node { elem, left, right, height, ..} => branch_symbols.repeat(ebene) + &format!("({elem}, {height}\n") + &left.simple_braces_string(ebene+1) + &right.simple_braces_string(ebene+1) + &branch_symbols.repeat(ebene) + ")\n"
+            AvlTree::Node {
+                elem,
+                left,
+                right,
+                height,
+                ..
+            } => {
+                branch_symbols.repeat(ebene)
+                    + &format!("({elem}, {height}\n")
+                    + &left.simple_braces_string(ebene + 1)
+                    + &right.simple_braces_string(ebene + 1)
+                    + &branch_symbols.repeat(ebene)
+                    + ")\n"
+            }
         }
     }
-    
 }
 
-impl<T> Default for AvlTree<T>{
+impl<T> Default for AvlTree<T> {
     fn default() -> Self {
         Self::Leaf
     }
 }
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn not_degenerating_1_2_3_4_5_6_7_8_9_10(){
+    fn not_degenerating_1_2_3_4_5_6_7_8_9_10() {
         let mut test_tree = AvlTree::new();
         test_tree.insert(1);
         assert!(test_tree.is_balanced());

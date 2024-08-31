@@ -1,4 +1,4 @@
-struct RedBlackTree<T> {
+pub struct RedBlackTree<T> {
     root: BlackNode<T>,
 }
 
@@ -25,3 +25,5 @@ struct RedNode<T> {
     height: usize,
     black_height: usize,
 }
+
+impl<T> RedBlackTree<T> {}
